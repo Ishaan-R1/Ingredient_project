@@ -1,0 +1,33 @@
+body {
+  background: linear-gradient(to bottom right, #b8d9f6, #d3f5c6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.found {
+  color: green;
+  font-weight: bolder;
+}
+.not-found {
+  color: red;
+}
+h2 {
+  font-family: Arial, Helvetica, sans-serif;
+}
+#output {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: medium;
+}
+.container {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 900px;
+  width: 100%;
+}
+#searchInput {
+    border-radius: 20px;
+    height: 35px;
+}

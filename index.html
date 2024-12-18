@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@2.1.1/dist/tesseract.min.js"></script>
+  <link rel="stylesheet" href="CSS/style.css" />
+
+</head>
+
+<body>
+  <!-- <form> -->
+    <div class="container">
+    <div id="form">
+    <h2>What ingredient are you looking for?</h2>
+    <input type="text" id="searchInput" placeholder="e.g., apple, banana, kiwi" size="50">
+    <p id="output"></p>
+  </div>
+  <div>
+    <h2>Upload an Image:</h2>
+    <input type="file" id="myFile">
+  </div>
+  <!-- </form> -->
+  <p id="result"></p>
+</div>
+  <script>
+    document.getElementById('myFile').addEventListener('change', function (event) {
+      const resultDisplay = document.getElementById("result");
+      const outputDiv = document.getElementById("output");
+      const searchInput = document.getElementById("searchInput").value.trim();
+
+      const file = event.target.files[0]; // Get the uploaded file
+      if (!file) {
+        outputDiv.innerText = "No file selected!";
+        return;
+      }
+
+      if (searchInput === "") {
+        outputDiv.innerText = "Please enter keywords before uploading the image.";
+        return;
+      }
+
+      // Create a temporary URL for the image
+      const imageUrl = URL.createObjectURL(file);
+
+      // Show processing message
+      outputDiv.innerHTML = "<p>Processing the image...</p>";
+
+      // Extract text from the image using Tesseract.js
+      Tesseract.recognize(
+        imageUrl,
+        'eng' // Language
+      ).then(({ data: { text } }) => {
+        // Split and clean extracted text
+        let extractedArray = text.split(/\s|,/).map(item => item.toLowerCase().trim());
+        console.log("Extracted Array:", extractedArray);
+
+        // Split user keywords
+        let keywords = searchInput.split(",").map(keyword => keyword.toLowerCase().trim());
+        console.log("Keywords:", keywords);
+
+        // Highlight results
+        let highlightedArray = extractedArray.map(item => {
+          if (keywords.includes(item)) {
+            return `<span class="found">${item}</span>`;
+          }
+          return item;
+        });
+
+        // Display the full extracted text with highlights
+        outputDiv.innerHTML = `
+          <h3>Extracted Text:</h3>
+          <p>${highlightedArray.join(" ")}</p>
+        `;
+
+        // Check which keywords were found
+        let foundKeywords = keywords.filter(keyword => extractedArray.includes(keyword));
+        let notFoundKeywords = keywords.filter(keyword => !extractedArray.includes(keyword));
+
+        // Display search results
+        resultDisplay.innerHTML = `
+          <h3>Search Results:</h3>
+          <p><span class="found">Found:</span> ${foundKeywords.join(", ") || "None"}</p>
+          <p><span class="not-found">Not Found:</span> ${notFoundKeywords.join(", ") || "None"}</p>
+        `;
+      }).catch(err => {
+        console.error(err);
+        outputDiv.innerHTML = "<p>Error processing the image. Please try again.</p>";
+      });
+    });
+    // document.getElementById('myFile').addEventListener('change', function(event) {
+    //    const resultDisplay = document.getElementById("result");
+    //         const file = event.target.files[0]; // Get the selected file
+    //         if (!file) {
+    //             document.getElementById('output').innerText = "No file selected!";
+    //             return;
+    //         }
+
+    //         // Show a processing message
+    //         const outputDiv = document.getElementById('output');
+
+            
+    //         console.log('Processing the image...');
+
+    //         // outputDiv.innerText = 'Processing the image...';
+
+    //         // Create a temporary URL for the image
+    //         const imageUrl = URL.createObjectURL(file);
+
+    //         // Use Tesseract.js to extract text from the image
+    //         Tesseract.recognize(
+    //             imageUrl,              // Path to the image
+    //             'eng',                 // Language (English by default)
+    //         ).then(({ data: { text } }) => {
+    //         // console.log('Error processing the image. Please try again.');
+              
+    //             // outputDiv.innerHTML = `<h3>Extracted Text:</h3><p>${text}</p>`;
+
+    //             console.log(typeof(text));
+    //             let arr = text.split(',');
+    //             const lowerCaseItems = arr.map(item => item.toLowerCase().trim());
+                
+    //             console.log("TEST: " + arr[0]);
+
+    //             const searchInput = document.getElementById("searchInput");
+
+    //             const searchText = searchInput.value.trim().toLowerCase();
+    //             console.log(searchInput);
+    //             console.log(lowerCaseItems);
+
+
+
+    //             // if (lowerCaseItems.includes(searchText)) {
+    //             // resultDisplay.textContent = `✅ "${searchText}" was found in the array.`;
+    //             // resultDisplay.style.color = "green";
+    //             // console.log("WORKS");
+    //             // // outputDiv.innerHTML = `<h3>Extracted Text:</h3><p>${text}</p>`;
+    //             // }
+
+    //             const input = document.getElementById("searchInput").value.trim();
+    //             // Check if the input exists in the array
+    //         const keywords = input.split(",").map(keyword => keyword.trim().toLowerCase());
+    //       if (lowerCaseItems.includes(searchText)) {
+    //           // Build HTML where the searched word is highlighted
+    //           const highlightedArray = lowerCaseItems.map(item => {
+    //               if (item === searchText) {
+    //                return outputDiv.innerHTML = `<span style="color: green; font-weight: bold;">${item}</span>`;
+    //                   // return `<span style="color: green; font-weight: bold;">${item}</span>`;
+    //               }
+    //               return item;
+    //           });
+
+    //           // Display the array with the matched word highlighted
+    //           resultDisplay.innerHTML = `<p>✅ "${searchText}" was found in the array:</p><p>${highlightedArray.join(", ")}</p>`;
+    //       } else {
+    //           resultDisplay.innerHTML = `<p>❌ "${searchText}" was not found in the array.</p>`;
+    //       }
+
+    //         }).catch(err => {
+    //             console.error(err);
+    //         console.log('Error processing the image. Please try again.');
+
+    //             // outputDiv.innerText = 'Error processing the image. Please try again.';
+    //         });
+    //     });
+    //     function searchForWord() {
+    //       const items = ["apple", "banana", "cherry", "date", "fig", "grape", "kiwi"];
+    //       const searchInput = document.getElementById("searchInput");
+    //       const resultDisplay = document.getElementById("result");
+
+
+    //       const searchText = searchInput.value.trim().toLowerCase();
+    //       console.log("You Searched: " + searchText);
+
+    //       if (items.includes(searchText)) {
+    //             resultDisplay.textContent = `✅ "${searchText}" was found in the array.`;
+    //             resultDisplay.style.color = "green";
+    //         } else {
+    //             resultDisplay.textContent = `❌ "${searchText}" was not found in the array.`;
+    //             resultDisplay.style.color = "red";
+    //         }
+    //     }
+
+    // document.getElementById('imageInput').addEventListener('change', function(event) {
+    //         const file = event.target.files[0]; // Get the selected file
+    //         if (!file) {
+    //             document.getElementById('output').innerText = "No file selected!";
+    //             return;
+    //         }
+
+    //         // Show a processing message
+    //         const outputDiv = document.getElementById('output');
+    //         outputDiv.innerText = 'Processing the image...';
+
+    //         // Create a temporary URL for the image
+    //         const imageUrl = URL.createObjectURL(file);
+            
+    // Tesseract.recognize(
+    //   'test.png',
+    //   'eng',
+    //   { logger: m => console.log(m) }
+    // ).then(({ data: { text } }) => {
+    //   console.log(text);
+    // })
+
+  </script>
+
+</body>
+
+</html>
